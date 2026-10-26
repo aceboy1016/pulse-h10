@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="dark">
+<title>PULSE | 心拍モニター</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23141615'/%3E%3Cpath d='M4 17h6l3-7 5 13 3-6h7' fill='none' stroke='%23c6f36b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="./style.css">
+<script type="module" src="./app.js"></script>
+</head>
+<body data-mode="prep">
+<header class="top">
+  <div class="brand">
+    <h1>PULSE<span class="dot">.</span></h1>
+    <p>H10 心拍モニター</p>
+  </div>
+  <div class="conn">
+    <span id="connState" class="state" data-state="idle"><i></i><span id="connText">未接続</span></span>
+    <button id="demoBtn" type="button" class="ghost">デモ</button>
+    <button id="connectBtn" type="button" class="primary">H10に接続</button>
+  </div>
+</header>
+
+<div id="unsupported" class="notice warn" hidden>
+  このブラウザはWeb Bluetoothに対応していません。H10と接続するには、<strong>MacのGoogle Chrome</strong>でこのページを開いてください（Safari・Firefoxは非対応）。デモ表示と保存済み記録の閲覧はこのままでも使えます。
+</div>
+<div id="message" class="notice" role="status" aria-live="polite" hidden></div>
+
+<section class="custbar" aria-label="顧客">
+  <label class="field inline"><span>顧客</span>
+    <select id="customerSelect"><option value="">顧客を選択</option></select>
+  </label>
+  <button id="newCustomer" type="button" class="ghost sm">新規登録</button>
+  <button id="editCustomer" type="button" class="ghost sm" disabled>編集</button>
+  <span id="demoBadge" class="badge demo" hidden>デモ</span>
+  <span class="spacer"></span>
+  <span id="saveState" class="savestate" data-s="none"></span>
+  <button id="backupBtn" type="button" class="ghost sm">バックアップ</button>
+  <label class="ghost sm filebtn">復元<input id="restoreInput" type="file" accept="application/json,.json" hidden></label>
+  <button id="infoBtn" type="button" class="ghost sm" aria-label="心拍の見方について">？</button>
+</section>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" data-mode="prep" type="button">運動前</button>
+  <button role="tab" data-mode="exercise" type="button">運動中</button>
+  <button role="tab" data-mode="recovery" type="button">回復</button>
+  <button role="tab" data-mode="result" type="button">結果</button>
+</nav>
+
+<main>
+<!-- 運動前 -->
+<section class="view" id="view-prep" data-view="prep">
+  <div class="grid2">
+    <div class="card">
+      <h2>顧客</h2>
+      <p id="prepCustomer" class="big-name">顧客を選択してください</p>
+      <p id="prepNote" class="note-text"></p>
+      <div class="row">
+        <label class="field"><span>年齢</span><input id="ageInput" type="number" inputmode="numeric" min="10" max="100" step="1"></label>
+        <div class="field"><span>推定最大心拍（208 − 0.7 × 年齢）</span><output id="estMax" class="val">—</output></div>
+      </div>
+      <div class="row">
+        <label class="check"><input id="useMeasured" type="checkbox"> 測定済み最大心拍を優先する</label>
+        <label class="field"><span>測定済み最大心拍</span><input id="measuredMax" type="number" inputmode="numeric" min="25" max="250" step="1" placeholder="bpm"></label>
+      </div>
+      <p class="sub">使用中の最大心拍：<strong id="usedMax">—</strong></p>
+      <label class="field"><span>普段の安静時心拍（起床時など。顧客の設定）</span><input id="restingInput" type="number" inputmode="numeric" min="25" max="250" step="1" placeholder="bpm"></label>
+    </div>
+    <div class="card">
+      <h2>今日の運動前心拍</h2>
+      <p class="sub">落ち着いた状態で数十秒座ってから登録してください。普段の安静時心拍とは別に、今日のセッションの基準として使います。</p>
+      <div class="prep-live"><span id="prepHr" class="mid-num">—</span><span class="unit">bpm</span><span id="prepHrState" class="sub">受信待ち</span></div>
+      <div class="row">
+        <button id="setPreHr" type="button" class="primary" disabled>直近10秒の平均を登録</button>
+        <label class="field"><span>手入力</span><input id="preHrInput" type="number" inputmode="numeric" min="25" max="250" step="1" placeholder="bpm"></label>
+      </div>
+      <p class="sub">登録値：<strong id="preHrVal">未登録</strong></p>
+      <button id="goExercise" type="button" class="primary wide">運動中の表示へ</button>
+    </div>
+  </div>
+</section>
+
+<!-- 運動中 -->
+<section class="view" id="view-exercise" data-view="exercise">
+  <div class="live">
+    <div class="hrbox">
+      <p class="label" id="hrLabel">現在の心拍数</p>
+      <div class="hrnum"><span id="hr" class="num">—</span><span class="unit">bpm</span></div>
+      <p class="sub" id="hrSub">H10を装着して「H10に接続」を押してください</p>
+    </div>
+    <div class="ringbox">
+      <svg class="ring" id="ring" viewBox="0 0 200 200" aria-hidden="true">
+        <circle cx="100" cy="100" r="86" class="track"/>
+        <circle cx="100" cy="100" r="86" class="bar" id="ringBar" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/>
+      </svg>
+      <div class="ringtext"><span id="pct" class="pct">—</span><small id="pctLabel">最大心拍に対して</small></div>
+      <p class="sub center" id="profileLine">—</p>
+    </div>
+    <div class="card intensity" id="intensityCard">
+      <p class="label">強度の目安</p>
+      <h3 id="zoneLabel">—</h3>
+      <p id="zoneDesc" class="zdesc">接続すると強度の目安を表示します</p>
+      <p id="zoneTalk" class="ztalk"></p>
+      <div class="figure"><svg id="zoneFig" viewBox="0 0 120 80" aria-hidden="true"></svg></div>
+      <p id="zoneExample" class="sub"></p>
+      <p id="zoneOver" class="sub warnline" hidden></p>
+    </div>
+  </div>
+  <div class="statsrow">
+    <div><p class="label">平均心拍</p><p id="sAvg" class="stat">—</p></div>
+    <div><p class="label">最大心拍</p><p id="sMax" class="stat">—</p></div>
+    <div><p class="label">最小心拍</p><p id="sMin" class="stat">—</p></div>
+    <div><p class="label">計測時間</p><p id="sTime" class="stat">00:00</p><p id="sGap" class="sub"></p></div>
+  </div>
+  <div class="card chartcard">
+    <div class="chart-head"><h2>心拍の推移 <span class="sub">直近5分</span></h2><span class="sub">網掛け＝欠測</span></div>
+    <canvas id="liveChart" class="chart"></canvas>
+  </div>
+  <button id="startRecovery" type="button" class="primary huge" disabled>セット終了・回復を測る</button>
+</section>
+
+<!-- 回復 -->
+<section class="view" id="view-recovery" data-view="recovery">
+  <div class="live rec">
+    <div class="ringbox">
+      <svg class="ring" viewBox="0 0 200 200" aria-hidden="true">
+        <circle cx="100" cy="100" r="86" class="track"/>
+        <circle cx="100" cy="100" r="86" class="bar" id="recRing" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/>
+      </svg>
+      <div class="ringtext"><span id="recSec" class="pct">0</span><small>秒 / 60秒</small></div>
+    </div>
+    <div class="hrbox">
+      <p class="label" id="dropLabel">回復開始からの低下</p>
+      <div class="hrnum"><span id="recDrop" class="num">—</span><span class="unit">bpm</span></div>
+      <p id="recDetail" class="detail">—</p>
+      <p id="recPre" class="sub"></p>
+    </div>
+    <div class="card">
+      <p class="label">現在の心拍</p>
+      <p class="mid"><span id="recHr" class="mid-num">—</span><span class="unit">bpm</span></p>
+      <table class="marks"><tbody>
+        <tr><th>30秒</th><td id="m30">—</td></tr>
+        <tr><th>60秒</th><td id="m60">—</td></tr>
+        <tr><th>120秒</th><td id="m120">—</td></tr>
+      </tbody></table>
+      <p class="sub">各時点の値は ±2秒以内の実測値を使用。範囲内に実測がない・途中で5秒以上の欠測がある場合は「測定不足／無効」として比較に使いません。</p>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h2>条件</h2>
+      <fieldset class="seg" id="methodSeg"><legend>回復方法</legend>
+        <label><input type="radio" name="method" value="座位" checked><span>座位</span></label>
+        <label><input type="radio" name="method" value="立位"><span>立位</span></label>
+        <label><input type="radio" name="method" value="ゆっくり歩く"><span>ゆっくり歩く</span></label>
+      </fieldset>
+      <div class="row3">
+        <label class="field"><span>種目</span><input id="cExercise" type="text" maxlength="120" placeholder="例：スクワット"></label>
+        <label class="field"><span>重量・負荷</span><input id="cLoad" type="text" maxlength="60" placeholder="例：60kg"></label>
+        <label class="field"><span>回数・時間</span><input id="cReps" type="text" maxlength="60" placeholder="例：10回"></label>
+      </div>
+      <label class="field"><span>メモ</span><input id="cNote" type="text" maxlength="500"></label>
+      <p id="compare" class="compare">—</p>
+    </div>
+    <div class="card chartcard">
+      <div class="chart-head"><h2>回復開始からの心拍</h2><span class="sub">0〜120秒</span></div>
+      <canvas id="recChart" class="chart"></canvas>
+    </div>
+  </div>
+  <div class="btnrow">
+    <button id="cancelRecovery" type="button" class="ghost">回復計測を中止</button>
+    <button id="finishRecovery" type="button" class="primary huge">記録して終了</button>
+  </div>
+</section>
+
+<!-- 結果 -->
+<section class="view" id="view-result" data-view="result">
+  <div class="card">
+    <div class="chart-head">
+      <h2 id="resTitle">セッション</h2>
+      <div class="btnrow tight">
+        <button id="resCsv" type="button" class="ghost sm" disabled>このセッションのCSV</button>
+        <button id="endSession" type="button" class="primary sm" disabled>セッションを終了</button>
+        <button id="backToLive" type="button" class="ghost sm" hidden>現在のセッションに戻る</button>
+      </div>
+    </div>
+    <div class="statsrow">
+      <div><p class="label">平均心拍</p><p id="rAvg" class="stat">—</p></div>
+      <div><p class="label">最大心拍</p><p id="rMax" class="stat">—</p></div>
+      <div><p class="label">最小心拍</p><p id="rMin" class="stat">—</p></div>
+      <div><p class="label">計測時間</p><p id="rTime" class="stat">—</p><p id="rGap" class="sub"></p></div>
+    </div>
+    <canvas id="resChart" class="chart tall"></canvas>
+    <h3 class="h3">回復記録</h3>
+    <div class="tablewrap"><table class="list" id="resRecoveries"></table></div>
+  </div>
+  <div class="card">
+    <div class="chart-head"><h2>同条件の回復記録の比較</h2><button id="recCsv" type="button" class="ghost sm" disabled>回復記録CSV</button></div>
+    <p class="sub">同じ顧客・同じ回復方法・同じ種目／負荷／回数で、デモと実測は分けて比較します。種目が未入力の記録は比較しません。</p>
+    <div id="compareGroups"></div>
+  </div>
+  <div class="card">
+    <div class="chart-head"><h2>顧客の履歴</h2></div>
+    <div class="tablewrap"><table class="list" id="history"></table></div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <span>記録はこのブラウザ内（IndexedDB）にのみ保存され、外部には送信されません。定期的にバックアップしてください。</span>
+  <button id="infoBtn2" type="button" class="linklike">心拍の見方について</button>
+</footer>
+
+<!-- 顧客フォーム -->
+<dialog id="customerDialog" class="dlg">
+  <form method="dialog" id="customerForm">
+    <h2 id="customerDialogTitle">顧客を登録</h2>
+    <label class="field"><span>氏名</span><input id="fName" type="text" maxlength="80" required autocomplete="off"></label>
+    <label class="field"><span>年齢</span><input id="fAge" type="number" min="10" max="100" step="1" required></label>
+    <label class="field"><span>メモ</span><textarea id="fNote" maxlength="2000" rows="3"></textarea></label>
+    <div class="btnrow">
+      <button id="deleteCustomer" type="button" class="danger sm" hidden>この顧客を削除</button>
+      <span class="spacer"></span>
+      <button value="cancel" type="button" class="ghost" id="fCancel">キャンセル</button>
+      <button value="ok" type="submit" class="primary">保存</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- 汎用確認 -->
+<dialog id="confirmDialog" class="dlg">
+  <h2 id="cfTitle"></h2>
+  <p id="cfBody" class="pre"></p>
+  <div class="btnrow" id="cfButtons"></div>
+</dialog>
+
+<!-- 説明 -->
+<dialog id="infoDialog" class="dlg wide">
+  <h2>心拍の見方について</h2>
+  <ul class="info">
+    <li><strong>強度の目安</strong>：ACSM（米国スポーツ医学会）の%最大心拍による区分（とても軽い＜57％、軽い57–63％、中くらい64–76％、きつい77–95％、最大に近い≥96％）を使っています。乳酸閾値や換気閾値などの生理学的な閾値とは別のものです。</li>
+    <li><strong>推定最大心拍</strong>：208 − 0.7 × 年齢（Tanaka式）。個人差が大きく、これを超えたことだけで異常とは判断しません。測定値があれば手動設定を優先してください。</li>
+    <li><strong>運動の参考イメージ</strong>：同じくらいの息の上がり方の例です。運動量や消費カロリーが同じという意味ではありません。</li>
+    <li><strong>心拍回復</strong>：心拍が下がった幅は自律神経の反応の目安です。乳酸の除去、筋肉の回復、次のセットを行えるかどうかは、心拍だけでは判断できません。</li>
+    <li>心拍だけで「無酸素状態」「脂肪が主な燃料」などは判定できません。</li>
+    <li>記録はこのブラウザ内にのみ保存されます。ブラウザのデータ消去で失われるため、定期的にバックアップしてください。</li>
+  </ul>
+  <form method="dialog"><div class="btnrow"><span class="spacer"></span><button class="primary">閉じる</button></div></form>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden>
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" /></svg>
+  <span id="toastText">保存しました</span>
+</div>
+</body>
+</html>
