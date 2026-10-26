@@ -218,7 +218,9 @@ table.list td.empty { color: var(--dim); }
   .statsrow > div:nth-child(n+3) { border-top: 1px solid var(--line); }
   .stat { font-size: 28px; }
   select { min-width: 0; flex: 1; }
-  .field.inline { flex: 1; }
+  .custbar .field.inline { flex: 1 1 100%; }
+  .field.inline > span { white-space: nowrap; }
+  .custbar .spacer { display: none; }
   .tabs button { padding: 12px 10px 10px; }
 }
 
