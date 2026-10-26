@@ -65,6 +65,10 @@ t('recovery: ended early → short', () => {
   const r = C.finalizeRecovery({ startHr: 150, samples: mk(s => 130, 40) });
   assert.equal(r.drops[30].status, 'ok'); assert.equal(r.drops[60].status, 'short'); assert.equal(r.drops[120].status, 'short');
 });
+t('recovery: time reached but no data → missing', () => {
+  const r = C.finalizeRecovery({ startHr: 150, samples: mk(s => 130, 100), durationS: 122 });
+  assert.equal(r.drops[60].status, 'ok'); assert.equal(r.drops[120].status, 'missing');
+});
 t('recovery pending while running', () => assert.equal(C.recoveryAt({ startHr: 150, samples: mk(s => 130, 20) }, 60).status, 'pending'));
 
 t('condition key / comparable', () => {
