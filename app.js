@@ -88,7 +88,12 @@ const confirmAsk = (title, body, okLabel = 'OK', kind = 'primary') =>
 function renderSaveState() {
   const el = $('saveState');
   if (S.saveError) { el.dataset.s = 'error'; el.textContent = '保存に失敗しました'; return; }
-  if (S.session && S.dirty) { el.dataset.s = 'dirty'; el.textContent = '未保存の記録あり'; return; }
+  if (S.session && S.dirty) {
+    const recent = S.lastSavedAt && Date.now() - S.lastSavedAt < 30000;
+    el.dataset.s = recent ? 'ok' : 'dirty';
+    el.textContent = recent ? '記録中・自動保存 ' + tf.format(S.lastSavedAt) : '未保存の記録あり';
+    return;
+  }
   if (S.lastSavedAt) { el.dataset.s = 'ok'; el.textContent = '保存済み ' + tf.format(S.lastSavedAt); return; }
   el.dataset.s = 'none'; el.textContent = '';
 }
@@ -158,11 +163,10 @@ async function ensureSource(src) {
 }
 
 // ---------- samples ----------
-function onSample(hr, source, contact) {
+function onSample(hr, source, contact, t = Date.now()) {
   if (contact === false) { S.noContact = true; return; } // 接触なしの値は記録しない
   S.noContact = false;
   if (!validHr(hr)) return;
-  const t = Date.now();
   S.live = { hr, t, source };
   S.buffer.push({ t, hr });
   while (S.buffer.length && t - S.buffer[0].t > 600000) S.buffer.shift();
@@ -173,7 +177,7 @@ function onSample(hr, source, contact) {
     markDirty();
   }
   const r = S.recovery;
-  if (r && !r.ended) {
+  if (r && !r.ended && t > r.startedAt) {
     const s = (t - r.startedAt) / 1000;
     if (s <= 125) r.samples.push({ s: Math.round(s * 10) / 10, hr });
     if (s >= 120) stopRecoveryClock();
@@ -220,13 +224,19 @@ async function startDemo() {
   if (sensor.connected) { message('H10と接続中はデモを使えません。先に切断してください。', 'warn'); return; }
   if (!(await ensureSource('demo'))) return;
   let hr = S.live?.hr || 72;
-  let n = 0;
+  let n = 0, next = Date.now();
+  // デモは1秒ごとの合成値。ブラウザがタイマーを間引いても、デモに限り1秒刻みの時刻で生成する
   S.demo = setInterval(() => {
-    n++;
-    const target = S.mode === 'recovery' && S.recovery ? 92 : S.mode === 'exercise' ? 150 + 8 * Math.sin(n / 25) : 70;
-    const k = S.mode === 'recovery' ? 0.035 : 0.06;
-    hr += (target - hr) * k + (Math.random() - 0.5) * 2.2;
-    onSample(Math.round(hr), 'demo', true);
+    const now = Date.now();
+    if (now - next > 120000) next = now - 120000;
+    while (next <= now) {
+      n++;
+      const target = S.mode === 'recovery' && S.recovery ? 92 : S.mode === 'exercise' ? 150 + 8 * Math.sin(n / 25) : 70;
+      const k = S.mode === 'recovery' ? 0.035 : 0.06;
+      hr += (target - hr) * k + (Math.random() - 0.5) * 2.2;
+      onSample(Math.round(hr), 'demo', true, next);
+      next += 1000;
+    }
   }, 1000);
   setConn('demo', 'デモ表示中（実測ではありません）');
   message('デモ表示中です。デモの記録は「デモ」として保存され、実測とは比較しません。');
@@ -445,7 +455,10 @@ function startRecovery() {
   message('回復計測を開始しました。60秒で確定し、そのまま120秒まで記録します。');
 }
 function stopRecoveryClock() {
-  if (S.recovery) S.recovery.ended = true;
+  if (S.recovery && !S.recovery.ended) {
+    S.recovery.ended = true;
+    S.recovery.durationS = Math.round(Math.min(125, (Date.now() - S.recovery.startedAt) / 1000) * 10) / 10;
+  }
   clearInterval(recClock); recClock = null;
   renderRecovery();
 }

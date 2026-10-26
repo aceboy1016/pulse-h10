@@ -81,7 +81,9 @@ export function recoveryAt(rec, T) {
   const lastS = samples.length ? samples.at(-1).s : 0;
   if (lastS < T - RECOVERY_TOLERANCE_S && !rec.ended) return { status: 'pending', value: null };
   const cand = samples.filter(p => Math.abs(p.s - T) <= RECOVERY_TOLERANCE_S);
-  if (!cand.length) return { status: lastS < T ? 'short' : 'missing', value: null };
+  // durationS: 計測を終えた時点の経過秒（無い場合は最後の実測時刻で判断）
+  const reached = Number.isFinite(rec.durationS) ? rec.durationS >= T : lastS >= T;
+  if (!cand.length) return { status: reached ? 'missing' : 'short', value: null };
   const pick = cand.reduce((a, b) => (Math.abs(b.s - T) < Math.abs(a.s - T) ? b : a));
   let prev = 0;
   for (const p of samples) {
@@ -192,6 +194,7 @@ function cleanRecovery(r, session, legacy, i) {
     preHr: num(r.preHr, HR_MIN, HR_MAX) ?? session.preHr ?? null,
     source, samples,
     interrupted: legacy ? r.invalid === true : r.interrupted === true,
+    durationS: legacy ? undefined : (num(r.durationS, 0, 600) ?? undefined),
     legacy: legacy || r.legacy === true,
   };
   const fin = finalizeRecovery(rec);

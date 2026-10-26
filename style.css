@@ -95,6 +95,7 @@ main { padding: 24px 32px 40px; max-width: 1500px; margin: 0 auto; }
 .card + .card { margin-top: 18px; }
 .card h2 { margin-bottom: 12px; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.grid2 > .card + .card { margin-top: 0; }
 .grid2 + .btnrow, .grid2 + .card, .card + .grid2 { margin-top: 18px; }
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; align-items: end; }
 .row3 { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 12px; margin: 14px 0; }
