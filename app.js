@@ -197,8 +197,43 @@ const sensor = new HeartRateSensor({
     if (st === 'connected') message('');
   },
 });
+// ---------- 全画面表示 ----------
+let wakeLock = null;
+async function keepAwake(on) {
+  try {
+    if (on && !wakeLock && 'wakeLock' in navigator && !document.hidden) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    } else if (!on && wakeLock) { await wakeLock.release(); wakeLock = null; }
+  } catch { wakeLock = null; } // 画面スリープ防止は使えなくても表示は続ける
+}
+function applyFs(on) {
+  document.body.classList.toggle('fs', on);
+  $('fsBtn').textContent = on ? '全画面を終了' : '全画面';
+  keepAwake(on);
+  if (on && (S.mode === 'prep' || S.mode === 'result')) setMode(S.recovery ? 'recovery' : 'exercise');
+  else { renderAll(); }
+  requestAnimationFrame(() => drawCharts());
+}
+async function toggleFs() {
+  const on = !document.body.classList.contains('fs');
+  if (on) {
+    try { await document.documentElement.requestFullscreen({ navigationUI: 'hide' }); } catch { /* 全画面APIが使えない場合も大きい表示にする */ }
+    applyFs(true);
+  } else {
+    if (document.fullscreenElement) { try { await document.exitFullscreen(); } catch { /* ignore */ } }
+    applyFs(false);
+  }
+}
+function renderFsInfo() {
+  $('fsConn').dataset.state = $('connState').dataset.state;
+  $('fsConnText').textContent = $('connText').textContent;
+  $('fsCustomer').textContent = customer()?.name || '';
+}
+
 function setConn(st, txt) {
   $('connState').dataset.state = st; $('connText').textContent = txt;
+  renderFsInfo();
   const b = $('connectBtn');
   b.textContent = st === 'connected' || st === 'connecting' || st === 'reconnecting' ? '切断' : st === 'lost' ? '再接続' : 'H10に接続';
   $('demoBtn').textContent = S.demo ? 'デモ停止' : 'デモ';
@@ -773,6 +808,7 @@ setInterval(() => {
 
 function renderAll() {
   renderSaveState();
+  renderFsInfo();
   renderLive();
   if (S.mode === 'prep') renderPrep();
   if (S.mode === 'recovery') renderRecovery();
@@ -784,6 +820,17 @@ function renderAll() {
 function num(v) { const n = Number(v); return v === '' || !Number.isFinite(n) ? null : Math.round(n); }
 function bind() {
   $('connectBtn').onclick = onConnectClick;
+  $('fsBtn').onclick = toggleFs;
+  $('fsExit').onclick = toggleFs;
+  // Escなどでブラウザの全画面が解除されたら表示も戻す
+  document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && document.body.classList.contains('fs')) applyFs(false); });
+  addEventListener('keydown', (e) => {
+    if (e.key !== 'f' && e.key !== 'F') return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target;
+    if (t.closest?.('input, textarea, select, dialog[open]')) return;
+    e.preventDefault(); toggleFs();
+  });
   $('demoBtn').onclick = () => (S.demo ? stopDemo() : startDemo());
   $('customerSelect').onchange = (e) => selectCustomer(e.target.value);
   $('newCustomer').onclick = async () => {
@@ -837,7 +884,7 @@ function bind() {
   addEventListener('beforeunload', (e) => { if ((S.session && S.dirty) || S.recovery) { e.preventDefault(); e.returnValue = ''; } });
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && S.session && S.dirty) saveSession({ silent: true });
-    if (!document.hidden) renderAll();
+    if (!document.hidden) { renderAll(); if (document.body.classList.contains('fs')) keepAwake(true); }
   });
   addEventListener('resize', () => drawCharts());
   reduceMotion.addEventListener?.('change', () => renderAll());

@@ -20,6 +20,7 @@
   <div class="conn">
     <span id="connState" class="state" data-state="idle"><i></i><span id="connText">未接続</span></span>
     <button id="demoBtn" type="button" class="ghost">デモ</button>
+    <button id="fsBtn" type="button" class="ghost" title="全画面表示（Fキー）">全画面</button>
     <button id="connectBtn" type="button" class="primary">H10に接続</button>
   </div>
 </header>
@@ -48,6 +49,8 @@
   <button role="tab" data-mode="exercise" type="button">運動中</button>
   <button role="tab" data-mode="recovery" type="button">回復</button>
   <button role="tab" data-mode="result" type="button">結果</button>
+  <span class="fsonly fsinfo"><span id="fsConn" class="state"><i></i><span id="fsConnText"></span></span><span id="fsCustomer"></span></span>
+  <button id="fsExit" type="button" class="ghost sm fsonly fsexit">全画面を終了</button>
 </nav>
 
 <main>

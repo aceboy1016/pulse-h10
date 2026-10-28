@@ -224,6 +224,46 @@ table.list td.empty { color: var(--dim); }
   .tabs button { padding: 12px 10px 10px; }
 }
 
+/* ---------- 全画面表示 ---------- */
+.fsonly { display: none !important; }
+body.fs .fsonly { display: inline-flex !important; }
+body.fs .top, body.fs .custbar, body.fs .foot, body.fs .notice { display: none !important; }
+body.fs .tabs { padding: 0 3vw; align-items: center; }
+body.fs .tabs button[role=tab] { padding: 10px 14px 8px; font-size: 14px; }
+.fsinfo { margin-left: auto; align-items: center; gap: 16px; color: var(--dim); font-size: 14px; white-space: nowrap; }
+.fsinfo .state { margin: 0; }
+.fsexit { margin-left: 12px; }
+body.fs main { max-width: none; padding: 2vh 3vw 3vh; }
+
+body.fs #view-exercise .live { grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: 2vh 3vw; align-items: center; }
+body.fs #view-exercise .live .hrbox { grid-column: 1; grid-row: 1 / span 2; }
+body.fs #view-exercise .ringbox { max-width: min(260px, 30vh); }
+body.fs #view-exercise .num { font-size: min(30vw, 52vh); }
+body.fs .hrnum .unit { font-size: clamp(28px, 3vw, 60px); }
+body.fs .label { font-size: clamp(14px, 1.3vw, 20px); }
+body.fs #hrSub { font-size: clamp(13px, 1.1vw, 18px); }
+body.fs .intensity { padding: 2vh 1.6vw; }
+body.fs .intensity h3 { font-size: clamp(32px, 3.4vw, 60px); }
+body.fs .zdesc { font-size: clamp(17px, 1.6vw, 28px); }
+body.fs .ztalk { font-size: clamp(15px, 1.3vw, 22px); }
+body.fs .figure { height: clamp(70px, 10vh, 120px); }
+body.fs .statsrow { margin: 2vh 0 1.5vh; }
+body.fs .stat { font-size: clamp(34px, 3.6vw, 64px); }
+body.fs #view-exercise .chart { height: clamp(120px, 16vh, 220px); }
+body.fs #startRecovery { margin-top: 1.5vh; }
+
+body.fs #view-recovery .live.rec { grid-template-columns: minmax(220px, .8fr) minmax(0, 1.7fr) minmax(0, 1fr); }
+body.fs #view-recovery .num { font-size: min(24vw, 42vh); }
+body.fs #view-recovery .ringbox { max-width: min(340px, 36vh); }
+body.fs .detail { font-size: clamp(20px, 1.9vw, 34px); }
+body.fs .marks td, body.fs .marks th { font-size: clamp(14px, 1.2vw, 20px); }
+
+@media (max-width: 720px) {
+  body.fs #view-exercise .live, body.fs #view-recovery .live.rec { grid-template-columns: 1fr; }
+  body.fs #view-exercise .live .hrbox { grid-row: auto; }
+  body.fs .fsinfo #fsCustomer { display: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .toast path { stroke-dashoffset: 0; }
