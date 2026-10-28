@@ -7,6 +7,7 @@ import {
 import { db } from './db.js';
 import { HeartRateSensor, bleSupported } from './ble.js';
 import { drawChart } from './charts.js';
+import { renderDog } from './dogs.js';
 
 const $ = (id) => document.getElementById(id);
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -398,30 +399,8 @@ function recentAvg() {
 }
 
 // ---------- render: live ----------
-const ICONS = {
-  stand: ['C60,13,6', 'M60 21 V46', 'M60 27 L51 41', 'M60 27 L69 41', 'M60 46 L55 72', 'M60 46 L65 72'],
-  walk: ['C58,12,6', 'M58 20 L60 45', 'M59 26 L50 39', 'M59 26 L68 37', 'M60 45 L50 72', 'M60 45 L67 59 L72 72'],
-  bike: ['O32,58,13', 'O88,58,13', 'M32 58 L50 40 L76 40 L88 58', 'M50 40 L58 58 L32 58', 'M58 58 L76 40', 'M74 40 L72 33 L80 33', 'C60,13,6', 'M58 20 L52 38', 'M57 25 L72 34', 'M52 38 L64 47 L58 58'],
-  run: ['C64,11,6', 'M62 19 L55 42', 'M60 25 L70 33 L76 27', 'M60 25 L49 31 L45 40', 'M55 42 L66 55 L62 72', 'M55 42 L44 55 L34 57'],
-  sprint: ['C74,15,6', 'M69 22 L54 41', 'M65 27 L79 34', 'M65 27 L50 22', 'M54 41 L70 51 L72 72', 'M54 41 L40 53 L28 49'],
-};
-const SVGNS = 'http://www.w3.org/2000/svg';
-let figKey = '';
-function drawFigure(key) {
-  if (figKey === key) return; figKey = key;
-  const svg = $('zoneFig'); svg.replaceChildren();
-  if (!key) return;
-  const ground = document.createElementNS(SVGNS, 'path'); ground.setAttribute('d', 'M8 74 H112'); ground.setAttribute('class', 'ground'); svg.append(ground);
-  for (const d of ICONS[key]) {
-    let el;
-    if (d[0] === 'C' || d[0] === 'O') {
-      const [x, y, r] = d.slice(1).split(',').map(Number);
-      el = document.createElementNS(SVGNS, 'circle'); el.setAttribute('cx', x); el.setAttribute('cy', y); el.setAttribute('r', r);
-      if (d[0] === 'C') el.setAttribute('class', 'head');
-    } else { el = document.createElementNS(SVGNS, 'path'); el.setAttribute('d', d); }
-    svg.append(el);
-  }
-}
+// 強度の参考イメージ：子犬のアニメーション（dogs.js / dogs.css）
+function drawFigure(key) { renderDog($('zoneFig'), key); }
 
 function renderLive() {
   const c = customer();

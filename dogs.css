@@ -1,0 +1,44 @@
+/* PULSE puppy: external CSS only; no inline styling or SMIL. */
+.figure svg {display:block;max-width:100%;height:100%;overflow:hidden;opacity:1;transition:opacity 90ms ease}
+.figure svg.dog-fade-out {opacity:0}
+.figure .dog-fill {fill:var(--text,#f3f4f1)}
+.figure .dog-eye {fill:var(--surface,#161918)}
+.figure .dog-tongue {fill:var(--accent,#c6f36b)}
+.figure .ear-line {fill:none;stroke:var(--surface,#161918);stroke-width:1.5;stroke-linecap:round}
+.figure .ground {fill:none;stroke:var(--text,#f3f4f1);stroke-width:1;opacity:.4;stroke-linecap:round}
+.figure .speed-lines {fill:none;stroke:var(--text,#f3f4f1);stroke-width:1.5;stroke-linecap:round;animation:lines .35s linear infinite}
+.figure .leg,.figure .tail,.figure .ear,.figure .dog-bounce,.figure .head {transform-box:fill-box}
+.figure .leg {transform-origin:50% 8%}
+.figure .tail {transform-origin:85% 85%}
+.figure .ear {transform-origin:70% 12%}
+.figure .head {transform-origin:30% 65%}
+.figure .dog-bounce {transform-origin:center 70%}
+.figure .tail {animation:wag 1.6s ease-in-out infinite}
+.figure .stand .dog-bounce {animation:breathe 1.6s ease-in-out infinite}
+.figure .walk .leg {animation:step 1.2s ease-in-out infinite}
+.figure .walk .front-far,.figure .walk .back-near {animation-delay:-.6s}
+.figure .walk .dog-bounce {animation:bob 1.2s ease-in-out infinite}
+.figure .bike .leg {animation:step .7s ease-in-out infinite}
+.figure .bike .front-far,.figure .bike .back-near {animation-delay:-.35s}
+.figure .bike .dog-bounce {animation:bob .7s ease-in-out infinite}
+.figure .run .leg {animation:stride .45s ease-in-out infinite}
+.figure .run .front-far,.figure .run .back-near {animation-delay:-.225s}
+.figure .run .dog-bounce {animation:bound .45s ease-in-out infinite}
+.figure .sprint .leg {animation:gallop .35s ease-in-out infinite}
+.figure .sprint .front-far,.figure .sprint .back-near {animation-delay:-.175s}
+.figure .sprint .dog-bounce {animation:bound .35s ease-in-out infinite}
+.figure .run .ear {animation:flop .45s ease-in-out infinite}
+.figure .sprint .ear {animation:flop .35s ease-in-out infinite}
+.figure .run .tail {animation:wag .45s ease-in-out infinite}
+.figure .sprint .tail {animation:wag .35s ease-in-out infinite}
+@keyframes wag {0%,100%{transform:rotate(-10deg)}50%{transform:rotate(16deg)}}
+@keyframes breathe {0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(1px) scaleY(.975)}}
+@keyframes step {0%,100%{transform:rotate(-18deg)}50%{transform:rotate(18deg)}}
+@keyframes stride {0%,100%{transform:rotate(-28deg)}50%{transform:rotate(26deg)}}
+@keyframes gallop {0%,100%{transform:rotate(-34deg) translateY(-2px)}50%{transform:rotate(32deg) translateY(1px)}}
+@keyframes bob {0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes bound {0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes flop {0%,100%{transform:rotate(5deg)}50%{transform:rotate(-18deg)}}
+@keyframes lines {0%,100%{opacity:.35;transform:translateX(0)}50%{opacity:.8;transform:translateX(-3px)}}
+.figure.paused svg * {animation-play-state:paused!important}
+@media (prefers-reduced-motion:reduce) {.figure svg,.figure svg * {animation:none!important;transition:none!important}}

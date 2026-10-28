@@ -137,9 +137,13 @@ main { padding: 24px 32px 40px; max-width: 1500px; margin: 0 auto; }
 .ztalk { color: var(--text); opacity: .85; margin-top: 4px; }
 .figure { margin: 14px 0 6px; height: 84px; }
 .figure svg { height: 100%; width: auto; }
-.figure svg * { fill: none; stroke: var(--text); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-.figure svg .ground { stroke: var(--line2); stroke-width: 1.5; }
-.figure svg .head { fill: var(--text); stroke: none; }
+.figure svg .dfill { fill: var(--text); stroke: var(--text); stroke-width: 2; stroke-linejoin: round; }
+.figure svg .dleg { fill: none; stroke: var(--text); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.figure svg .dear { fill: var(--text); stroke: var(--surface); stroke-width: 1.6; }
+.figure svg .deye { fill: var(--surface); }
+.figure svg .dtongue { fill: var(--accent); }
+.figure svg .dspeed { fill: none; stroke: var(--dim); stroke-width: 2; stroke-linecap: round; }
+.figure svg .ground { fill: none; stroke: var(--line2); stroke-width: 1.5; }
 .warnline { color: var(--warn); margin-top: 8px; }
 
 .statsrow { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 26px 0 18px; }
