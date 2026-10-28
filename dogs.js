@@ -1,33 +1,51 @@
-// PULSE athletic dog. Static SVG fragments only (no user-supplied markup).
-const keys = new Set(['stand','walk','bike','run','sprint']);
-const leg=(name,d)=>`<g class="limb ${name}"><path class="fur" d="${d}"/></g>`;
-const common=(key)=>`<g class="dog ${key}"><g class="motion">
-<g class="tail"><path class="fur" d="M30 40 Q18 35 15 23 Q14 19 18 20 Q22 31 35 33 L38 40Z"/></g>
-${leg('rear-away','M35 49 Q31 55 33 62 L30 68 Q33 70 39 69 L43 61 L47 51Z')}
-${leg('fore-away','M75 46 L79 57 L78 67 Q81 70 87 69 L87 65 L85 55 L83 46Z')}
-<path class="fur torso" d="M28 39 Q33 30 50 30 Q67 29 78 34 Q84 28 88 32 L92 43 Q85 50 77 52 Q62 59 44 55 Q29 53 27 45Z"/>
-<g class="neck"><path class="fur" d="M72 35 Q77 24 85 22 L96 28 L94 44 Q84 48 78 50Z"/></g>
-<g class="head"><path class="fur" d="M80 25 Q83 15 94 16 Q104 16 107 24 L108 30 Q114 31 115 37 Q115 42 108 44 L97 44 Q91 47 85 41 Q80 35 80 25Z"/>
-<g class="ear"><path class="fur" d="M85 19 Q76 15 78 27 Q79 35 86 36 Q91 31 90 25Z"/><path class="ear-seam" d="M85 22 Q83 27 85 32"/></g>
-<path class="eye" d="M100 25 a2 2 0 1 0 0 4 a2 2 0 1 0 0 -4"/><path class="nose" d="M110 32 Q115 32 114 36 Q111 39 108 35Z"/>
-<path class="mouth" d="M104 40 Q108 43 111 40"/>
-${['bike','run','sprint'].includes(key)?'<path class="tongue" d="M105 42 Q107 49 110 48 Q112 47 110 42Z"/>':''}
-</g>
-${leg('rear-near','M36 49 Q40 49 44 53 L41 61 L40 66 Q44 68 45 69 L32 69 Q30 67 32 63Z')}
-${leg('fore-near','M76 47 Q81 47 85 50 L83 60 L85 67 Q89 68 90 70 L78 70 Q75 68 76 65 L75 56Z')}
-</g>${key==='sprint'?'<g class="speed"><path d="M9 31 H22 M7 41 H19 M10 51 H23"/></g>':''}</g><path class="ground" d="M8 74 H112"/>`;
-const scenes=Object.fromEntries([...keys].map(k=>[k,common(k)]));
-const transitions=new WeakMap();
+// PULSE canine gait illustrations. (PULSE側で修正: アニメーションする部品と位置指定のgを分離、舌の座標を頭基準に) Coordinates/angles are intentionally fixed, not user-supplied.
+const NS='http://www.w3.org/2000/svg';
+const keys=['stand','walk','bike','run','sprint'];
+const config={stand:{period:1.6,travel:0},walk:{period:1.2,travel:1},bike:{period:.7,travel:2},run:{period:.45,travel:3},sprint:{period:.35,travel:4}};
+const path=(d,cls='dog-white')=>`<path class="${cls}" d="${d}"/>`;
+// Self-contained vector artwork, with articulated limb pieces pivoting at anatomical joints.
+const dogMarkup=(key)=>{
+ const q=config[key];
+ const speed=key==='sprint'?'dog-sprint':key==='run'?'dog-run':key==='bike'?'dog-trot':key==='walk'?'dog-walk':'dog-stand';
+ const lines=key==='sprint'?`<g class="dog-speed">${path('M6 35 H23 M5 44 H18 M9 53 H25','dog-speed-stroke')}</g>`:'';
+ const tongue=(key==='bike'||key==='run'||key==='sprint')?path('M18 5 Q23 6 22 11 Q20 14 17 11 Q16 8 17 6 Z','dog-tongue'):'';
+ const leg=(name,x,y,front,far=false)=>{
+  const upper=front? 'M-4 -2 Q0 -5 4 -1 L5 13 Q2 17 -2 15 Z':'M-5 -3 Q2 -6 7 -1 L5 14 Q1 17 -3 14 Z';
+  const lower=front?'M-2 -2 Q2 -4 4 -1 L4 11 Q6 14 10 14 L10 17 L-1 17 Z':'M-2 -2 Q2 -4 4 0 L3 11 Q5 14 10 14 L10 17 L-1 17 Z';
+  return `<g class="dog-leg ${front?'front':'hind'} ${far?'far':'near'} ${name}" transform="translate(${x} ${y})"><g class="dog-upper">${path(upper)}<g transform="translate(2 13)"><g class="dog-lower">${path(lower)}</g></g></g></g>`;
+ };
+ return `<g class="dog-gait ${speed}" data-gait="${key}" transform="translate(0 -3)">${lines}<g class="dog-core">
+ <g transform="translate(31 38)"><g class="dog-tail">${path('M3 3 Q-7 4 -12 -5 Q-16 -12 -11 -17 Q-11 -8 -4 -7 Q3 -5 7 0 Z')}</g></g>
+ ${leg('back-left',42,50,false,true)}${leg('front-left',81,48,true,true)}
+ <g class="dog-torso">${path('M32 37 C39 29 52 31 64 32 C72 32 78 29 83 28 C87 32 90 38 91 45 C87 49 82 51 77 49 C66 45 58 48 49 48 C40 49 34 45 29 43 Z')}
+ ${path('M73 34 Q79 25 82 22 L88 20 Q90 26 85 32 L84 41 Z')}
+ </g>
+ ${leg('back-right',42,49,false)}${leg('front-right',81,47,true)}
+ <g class="dog-neck" transform="translate(82 31)">${path('M-4 11 Q-2 0 7 -6 L11 0 L8 14 Z')}
+ <g transform="translate(6 -8)"><g class="dog-head">${path('M-5 -3 Q-2 -11 8 -12 Q16 -10 18 -4 L26 -1 Q29 1 28 5 Q23 9 17 6 L12 8 Q6 10 0 5 Z')}
+ ${path('M17 2 Q22 2 24 4','dog-mouth')}${path('M24 -1 Q27 -1 28 2 L24 3 Z','dog-nose')}${path('M12 -5 Q15 -7 17 -5 Q15 -2 13 -3 Z','dog-eye')}
+ <g transform="translate(3 -8)"><g class="dog-ear">${path('M-3 0 Q-9 1 -11 10 Q-12 15 -7 16 Q-1 11 2 2 Z')}${path('M-3 1 Q-6 6 -6 12','dog-ear-line')}</g></g>${tongue}</g></g></g>
+ </g>${path('M8 80 H112','dog-ground')}</g>`;
+};
+const cache=Object.fromEntries(keys.map(k=>[k,dogMarkup(k)]));
+const current=new WeakMap();
 export function renderDog(svgEl,key){
- if(!svgEl)return;
- const next=keys.has(key)?key:'';
- const active=transitions.get(svgEl);
- if(active?.key===next||(!active&&svgEl.dataset.dogKey===next))return;
- if(active)clearTimeout(active.timer);
- svgEl.classList.remove('dog-switch');
- const update=()=>{svgEl.innerHTML=scenes[next]||'';svgEl.dataset.dogKey=next;svgEl.classList.remove('dog-switch');transitions.delete(svgEl)};
- if(!svgEl.innerHTML){update();return}
- svgEl.classList.add('dog-switch');
- const timer=setTimeout(update,90);
- transitions.set(svgEl,{key:next,timer});
+ if(!(svgEl instanceof SVGElement))return;
+ if(key!==''&&!keys.includes(key))key='';
+ const prev=current.get(svgEl);
+ if(prev?.key===key)return;
+ if(prev?.timer)clearTimeout(prev.timer);
+ current.set(svgEl,{key,timer:null});
+ svgEl.classList.add('dog-svg');
+ // Fade out old artwork, then mount fresh artwork and fade in. Existing same-key DOM is never touched.
+ svgEl.classList.add('dog-fade-out');
+ const mount=()=>{
+  if(current.get(svgEl)?.key!==key)return;
+  svgEl.innerHTML=key?cache[key]:'';
+  svgEl.setAttribute('viewBox','0 0 120 80');
+  svgEl.classList.remove('dog-fade-out');
+ };
+ if(!prev){mount();return;}
+ const timer=setTimeout(mount,90);
+ current.set(svgEl,{key,timer});
 }
