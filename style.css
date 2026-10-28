@@ -233,34 +233,45 @@ body.fs .tabs button[role=tab] { padding: 10px 14px 8px; font-size: 14px; }
 .fsinfo { margin-left: auto; align-items: center; gap: 16px; color: var(--dim); font-size: 14px; white-space: nowrap; }
 .fsinfo .state { margin: 0; }
 .fsexit { margin-left: 12px; }
-body.fs main { max-width: none; padding: 2vh 3vw 3vh; }
+body.fs main { max-width: none; padding: 1.5vh 3vw 1vh; }
 
-body.fs #view-exercise .live { grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: 2vh 3vw; align-items: center; }
+/* 運動中：1画面に収める（心拍の数字を最優先で大きく） */
+body.fs #view-exercise.active { display: flex; flex-direction: column; height: calc(100vh - 46px - 3vh); }
+body.fs #view-exercise .live { flex: 1 1 auto; min-height: 0; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); grid-template-rows: auto 1fr; gap: 1.5vh 3vw; align-items: center; }
 body.fs #view-exercise .live .hrbox { grid-column: 1; grid-row: 1 / span 2; }
-body.fs #view-exercise .ringbox { max-width: min(260px, 30vh); }
-body.fs #view-exercise .num { font-size: min(30vw, 52vh); }
+body.fs #view-exercise .ringbox { max-width: min(240px, 21vh); }
+body.fs #profileLine { margin-top: 4px; }
+body.fs #view-exercise .num { font-size: min(29vw, 46vh); }
 body.fs .hrnum .unit { font-size: clamp(28px, 3vw, 60px); }
 body.fs .label { font-size: clamp(14px, 1.3vw, 20px); }
 body.fs #hrSub { font-size: clamp(13px, 1.1vw, 18px); }
-body.fs .intensity { padding: 2vh 1.6vw; }
-body.fs .intensity h3 { font-size: clamp(32px, 3.4vw, 60px); }
+body.fs .intensity { padding: 1.6vh 1.4vw; align-self: stretch; }
+body.fs .intensity h3 { font-size: clamp(30px, 3vw, 54px); margin: 0 0 4px; }
 body.fs .zdesc { font-size: clamp(17px, 1.6vw, 28px); }
 body.fs .ztalk { font-size: clamp(15px, 1.3vw, 22px); }
-body.fs .figure { height: clamp(70px, 10vh, 120px); }
-body.fs .statsrow { margin: 2vh 0 1.5vh; }
-body.fs .stat { font-size: clamp(34px, 3.6vw, 64px); }
-body.fs #view-exercise .chart { height: clamp(120px, 16vh, 220px); }
-body.fs #startRecovery { margin-top: 1.5vh; }
+body.fs .figure { height: clamp(48px, 7vh, 90px); margin: 1vh 0 .5vh; }
+body.fs #zoneExample { font-size: 12px; }
+body.fs #view-exercise .statsrow { margin: 1.2vh 0 1vh; flex: none; }
+body.fs .statsrow > div { padding-top: 1vh; padding-bottom: 1vh; }
+body.fs .stat { font-size: clamp(30px, 3.2vw, 56px); }
+body.fs #view-exercise .chartcard { flex: none; padding: 1vh 1.2vw; }
+body.fs #view-exercise .chartcard .chart-head { display: none; }
+body.fs #view-exercise .chart { height: clamp(70px, 10vh, 160px); }
+body.fs #startRecovery { flex: none; margin-top: 1vh; padding: 1.6vh; }
 
+/* 回復 */
 body.fs #view-recovery .live.rec { grid-template-columns: minmax(220px, .8fr) minmax(0, 1.7fr) minmax(0, 1fr); }
-body.fs #view-recovery .num { font-size: min(24vw, 42vh); }
-body.fs #view-recovery .ringbox { max-width: min(340px, 36vh); }
+body.fs #view-recovery .num { font-size: min(22vw, 36vh); }
+body.fs #view-recovery .ringbox { max-width: min(320px, 32vh); }
+body.fs #view-recovery .chart { height: clamp(110px, 16vh, 200px); }
+body.fs #view-recovery .btnrow { margin-top: 1.5vh; }
 body.fs .detail { font-size: clamp(20px, 1.9vw, 34px); }
 body.fs .marks td, body.fs .marks th { font-size: clamp(14px, 1.2vw, 20px); }
 
 @media (max-width: 720px) {
   body.fs #view-exercise .live, body.fs #view-recovery .live.rec { grid-template-columns: 1fr; }
   body.fs #view-exercise .live .hrbox { grid-row: auto; }
+  body.fs #view-exercise.active { display: block; height: auto; }
   body.fs .fsinfo #fsCustomer { display: none; }
 }
 
