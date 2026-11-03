@@ -283,3 +283,4 @@ body.fs .marks td, body.fs .marks th { font-size: clamp(14px, 1.2vw, 20px); }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .toast path { stroke-dashoffset: 0; }
 }
+.cardhead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }

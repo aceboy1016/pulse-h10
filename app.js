@@ -8,6 +8,7 @@ import { db } from './db.js';
 import { HeartRateSensor, bleSupported } from './ble.js';
 import { drawChart } from './charts.js';
 import { renderDog } from './dogs.js';
+import { renderBeach } from './beach.js';
 
 const $ = (id) => document.getElementById(id);
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -399,8 +400,25 @@ function recentAvg() {
 }
 
 // ---------- render: live ----------
-// 強度の参考イメージ：子犬のアニメーション（dogs.js / dogs.css）
-function drawFigure(key) { renderDog($('zoneFig'), key); }
+// 強度の参考イメージ：子犬（dogs.js）／浜辺のおいかけっこ（beach.js）を切り替え。選択はこの端末にだけ記憶する
+const FIGURES = { dog: renderDog, beach: renderBeach };
+let figureMode = 'dog';
+try { if (localStorage.getItem('pulse-figure') === 'beach') figureMode = 'beach'; } catch { /* 記憶できなくても動く */ }
+let figureKey = '';
+function drawFigure(key) {
+  figureKey = key;
+  FIGURES[figureMode]($('zoneFig'), key);
+  const t = $('figToggle');
+  t.textContent = figureMode === 'dog' ? '浜辺にする' : '犬にする';
+  t.setAttribute('aria-pressed', String(figureMode === 'beach'));
+}
+function toggleFigure() {
+  FIGURES[figureMode]($('zoneFig'), '');
+  $('zoneFig').classList.remove('pulse-dog-svg', 'beach-svg');
+  figureMode = figureMode === 'dog' ? 'beach' : 'dog';
+  try { localStorage.setItem('pulse-figure', figureMode); } catch { /* 記憶できなくても動く */ }
+  drawFigure(figureKey);
+}
 
 function renderLive() {
   const c = customer();
@@ -800,6 +818,7 @@ function num(v) { const n = Number(v); return v === '' || !Number.isFinite(n) ? 
 function bind() {
   $('connectBtn').onclick = onConnectClick;
   $('fsBtn').onclick = toggleFs;
+  $('figToggle').onclick = toggleFigure;
   $('fsExit').onclick = toggleFs;
   // Escなどでブラウザの全画面が解除されたら表示も戻す
   document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && document.body.classList.contains('fs')) applyFs(false); });
