@@ -1,66 +1,91 @@
-/* PULSE articulated canine animations — append to existing style.css. */
-.dog-svg{width:100%;height:100%;display:block;overflow:hidden;opacity:1;transition:opacity 90ms ease}
-.dog-svg.dog-fade-out{opacity:0}
-.dog-white{fill:var(--text,#f3f4f1)}
-.dog-eye,.dog-ear-line{fill:var(--surface,#161918)}
-.dog-mouth{fill:none;stroke:var(--surface,#161918);stroke-width:1.1;stroke-linecap:round}
-.dog-nose{fill:var(--surface,#161918)}
-.dog-tongue{fill:var(--accent,#c6f36b)}
-.dog-ground{fill:none;stroke:var(--text,#f3f4f1);stroke-width:.8;opacity:.22}
-.dog-speed-stroke{fill:none;stroke:var(--text,#f3f4f1);stroke-width:1;stroke-linecap:round;opacity:.48}
-.dog-gait{--cycle:1.6s}
-.dog-walk{--cycle:1.2s}.dog-trot{--cycle:.7s}.dog-run{--cycle:.45s}.dog-sprint{--cycle:.35s}
-.dog-core,.dog-torso,.dog-head,.dog-ear,.dog-tail,.dog-upper,.dog-lower,.dog-speed{transform-box:view-box}
-.dog-core{transform-origin:60px 41px;animation:dog-bob var(--cycle) ease-in-out infinite}
-.dog-head{transform-origin:0px 2px;animation:dog-head-nod var(--cycle) ease-in-out infinite}
-.dog-ear{transform-origin:0px 0px;animation:dog-ear-flap var(--cycle) ease-in-out infinite}
-.dog-tail{transform-origin:0px 0px;animation:dog-tail-wag var(--cycle) ease-in-out infinite}
-.dog-leg{transform-box:view-box}
-.dog-leg .dog-upper{transform-origin:0px 0px;animation:dog-hip var(--cycle) ease-in-out infinite}
-.dog-leg .dog-lower{transform-origin:0px 0px;animation:dog-knee var(--cycle) ease-in-out infinite}
-.dog-leg.far{opacity:.72}
-.dog-leg.back-left .dog-upper,.dog-leg.front-right .dog-upper{animation-delay:calc(var(--cycle)*-.5)}
-.dog-leg.back-left .dog-lower,.dog-leg.front-right .dog-lower{animation-delay:calc(var(--cycle)*-.5)}
-.dog-walk .dog-leg.back-left .dog-upper,.dog-walk .dog-leg.back-left .dog-lower{animation-delay:calc(var(--cycle)*-.25)}
-.dog-walk .dog-leg.front-left .dog-upper,.dog-walk .dog-leg.front-left .dog-lower{animation-delay:calc(var(--cycle)*-.75)}
-.dog-walk .dog-leg.front-right .dog-upper,.dog-walk .dog-leg.front-right .dog-lower{animation-delay:calc(var(--cycle)*-.5)}
-.dog-stand .dog-leg .dog-upper,.dog-stand .dog-leg .dog-lower{animation:none}
-.dog-stand .dog-core{animation-name:dog-breathe}
-.dog-stand .dog-head,.dog-stand .dog-ear{animation:none}
-.dog-walk .dog-core{animation-name:dog-walk-bob}
-.dog-walk .dog-leg .dog-upper{animation-name:dog-walk-hip}
-.dog-walk .dog-leg .dog-lower{animation-name:dog-walk-knee}
-.dog-trot .dog-core{animation-name:dog-trot-bob}
-.dog-trot .dog-leg .dog-upper{animation-name:dog-trot-hip}
-.dog-trot .dog-leg .dog-lower{animation-name:dog-trot-knee}
-.dog-run .dog-core{animation-name:dog-run-bob}
-.dog-run .dog-leg .dog-upper{animation-name:dog-run-hip}
-.dog-run .dog-leg .dog-lower{animation-name:dog-run-knee}
-.dog-sprint .dog-core{animation-name:dog-sprint-bob}
-.dog-sprint .dog-torso{transform-origin:60px 41px;animation:dog-spine var(--cycle) ease-in-out infinite}
-.dog-sprint .dog-leg .dog-upper{animation-name:dog-sprint-hip}
-.dog-sprint .dog-leg .dog-lower{animation-name:dog-sprint-knee}
-.dog-sprint .dog-leg.front-right .dog-upper,.dog-sprint .dog-leg.front-right .dog-lower{animation-delay:calc(var(--cycle)*-.07)}
-.dog-sprint .dog-leg.back-left .dog-upper,.dog-sprint .dog-leg.back-left .dog-lower{animation-delay:calc(var(--cycle)*-.55)}
-.dog-sprint .dog-speed{animation:dog-lines var(--cycle) ease-in-out infinite}
-@keyframes dog-breathe{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-.5px) scaleY(1.02)}}
-@keyframes dog-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.4px)}}
-@keyframes dog-walk-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
-@keyframes dog-trot-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.8px)}}
-@keyframes dog-run-bob{0%,100%{transform:translateY(1px) rotate(1deg)}50%{transform:translateY(-4px) rotate(-2deg)}}
-@keyframes dog-sprint-bob{0%,100%{transform:translateY(1px) rotate(2deg)}48%{transform:translateY(-5px) rotate(-3deg)}}
-@keyframes dog-spine{0%,100%{transform:scaleX(.96)}50%{transform:scaleX(1.04)}}
-@keyframes dog-walk-hip{0%,100%{transform:rotate(-19deg)}50%{transform:rotate(19deg)}}
-@keyframes dog-walk-knee{0%,100%{transform:rotate(5deg)}50%{transform:rotate(-23deg)}}
-@keyframes dog-trot-hip{0%,100%{transform:rotate(-29deg)}50%{transform:rotate(28deg)}}
-@keyframes dog-trot-knee{0%,100%{transform:rotate(20deg)}50%{transform:rotate(-36deg)}}
-@keyframes dog-run-hip{0%,100%{transform:rotate(-43deg)}50%{transform:rotate(43deg)}}
-@keyframes dog-run-knee{0%,100%{transform:rotate(33deg)}50%{transform:rotate(-50deg)}}
-@keyframes dog-sprint-hip{0%,100%{transform:rotate(-60deg)}48%{transform:rotate(54deg)}}
-@keyframes dog-sprint-knee{0%,100%{transform:rotate(52deg)}48%{transform:rotate(-61deg)}}
-@keyframes dog-head-nod{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-4deg)}}
-@keyframes dog-ear-flap{0%,100%{transform:rotate(2deg)}50%{transform:rotate(-18deg)}}
-@keyframes dog-tail-wag{0%,100%{transform:rotate(-9deg)}50%{transform:rotate(14deg)}}
-@keyframes dog-lines{0%,100%{opacity:.3;transform:translateX(3px)}50%{opacity:.8;transform:translateX(-3px)}}
-.figure.paused .dog-svg *, .figure.paused .dog-svg{animation-play-state:paused!important}
-@media(prefers-reduced-motion:reduce){.dog-svg,.dog-svg *{animation:none!important;transition:none!important}}
+/**
+ * PULSE — JACK RUSSELL MOTION ENGINE (dogs.css)
+ * Version 3.2 | Athletic Silhouette + Classic Jack Russell Tan Markings (#D98B48)
+ */
+
+.pulse-dog-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.dog-ground-line {
+  stroke: #2C312F;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+
+.dog-stage-group {
+  opacity: 1;
+  transition: opacity 180ms ease-in-out;
+  will-change: opacity;
+}
+
+.dog-stage-fading {
+  animation: pulseDogKeyFade 180ms ease-in-out;
+}
+
+@keyframes pulseDogKeyFade {
+  0% {
+    opacity: 0.32;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.dog-torso,
+.dog-limb-near {
+  fill: #F3F4F1;
+  stroke: none;
+}
+
+/* Classic Jack Russell Terrier Warm Tan Markings (Head/Ear Mask & Tail-Root Patch) */
+.dog-tan-patch,
+.dog-ear-outer {
+  fill: #D98B48;
+  stroke: none;
+}
+
+.dog-limb-far {
+  fill: #F3F4F1;
+  stroke: #161918;
+  stroke-width: 0.95;
+  stroke-linejoin: round;
+}
+
+.dog-cutout {
+  fill: #161918;
+  stroke: none;
+}
+
+.dog-ear-cutout {
+  stroke: #161918;
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+}
+
+.dog-tongue {
+  fill: #C6F36B;
+  stroke: #161918;
+  stroke-width: 0.45;
+  stroke-linejoin: round;
+}
+
+.figure.paused .dog-stage-fading,
+.paused .dog-stage-fading {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dog-stage-group,
+  .dog-stage-fading {
+    transition: none;
+    animation: none;
+  }
+}
