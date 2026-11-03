@@ -135,7 +135,7 @@ main { padding: 24px 32px 40px; max-width: 1500px; margin: 0 auto; }
 .intensity h3 { font-size: 30px; font-weight: 700; color: var(--accent); margin: 2px 0 8px; }
 .zdesc { font-size: 17px; font-weight: 600; }
 .ztalk { color: var(--text); opacity: .85; margin-top: 4px; }
-.figure { margin: 14px 0 6px; height: 84px; }
+.figure { margin: 14px 0 6px; height: 106px; }
 .figure svg { height: 100%; width: auto; }
 .figure svg .dfill { fill: var(--text); stroke: var(--text); stroke-width: 2; stroke-linejoin: round; }
 .figure svg .dleg { fill: none; stroke: var(--text); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
@@ -253,7 +253,7 @@ body.fs .intensity { padding: 1.6vh 1.4vw; align-self: stretch; }
 body.fs .intensity h3 { font-size: clamp(30px, 3vw, 54px); margin: 0 0 4px; }
 body.fs .zdesc { font-size: clamp(17px, 1.6vw, 28px); }
 body.fs .ztalk { font-size: clamp(15px, 1.3vw, 22px); }
-body.fs .figure { height: clamp(48px, 7vh, 90px); margin: 1vh 0 .5vh; }
+body.fs .figure { height: clamp(60px, 9vh, 112px); margin: 1vh 0 .5vh; }
 body.fs #zoneExample { font-size: 12px; }
 body.fs #view-exercise .statsrow { margin: 1.2vh 0 1vh; flex: none; }
 body.fs .statsrow > div { padding-top: 1vh; padding-bottom: 1vh; }
