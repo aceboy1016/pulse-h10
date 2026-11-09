@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="./style.css">
 <link rel="stylesheet" href="./dogs.css">
 <link rel="stylesheet" href="./beach.css">
+<link rel="stylesheet" href="./penguin.css">
 <script type="module" src="./app.js"></script>
 </head>
 <body data-mode="prep">
@@ -105,7 +106,7 @@
       <p class="sub center" id="profileLine">—</p>
     </div>
     <div class="card intensity" id="intensityCard">
-      <div class="cardhead"><p class="label">強度の目安</p><button type="button" class="linklike" id="figToggle" aria-pressed="false">浜辺にする</button></div>
+      <div class="cardhead"><p class="label">強度の目安</p><div class="figpick" id="figPick" role="group" aria-label="参考イメージ"><button type="button" data-fig="dog" aria-pressed="true">犬</button><button type="button" data-fig="beach" aria-pressed="false">浜辺</button><button type="button" data-fig="penguin" aria-pressed="false">ペンギン</button></div></div>
       <h3 id="zoneLabel">—</h3>
       <p id="zoneDesc" class="zdesc">接続すると強度の目安を表示します</p>
       <p id="zoneTalk" class="ztalk"></p>

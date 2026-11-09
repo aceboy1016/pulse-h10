@@ -9,6 +9,7 @@ import { HeartRateSensor, bleSupported } from './ble.js';
 import { drawChart } from './charts.js';
 import { renderDog } from './dogs.js';
 import { renderBeach } from './beach.js';
+import { renderPenguin } from './penguin.js';
 
 const $ = (id) => document.getElementById(id);
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -400,22 +401,21 @@ function recentAvg() {
 }
 
 // ---------- render: live ----------
-// 強度の参考イメージ：子犬（dogs.js）／浜辺のおいかけっこ（beach.js）を切り替え。選択はこの端末にだけ記憶する
-const FIGURES = { dog: renderDog, beach: renderBeach };
+// 強度の参考イメージ：子犬（dogs.js）／浜辺のおいかけっこ（beach.js）／ペンギン（penguin.js）から選ぶ。選択はこの端末にだけ記憶する
+const FIGURES = { dog: renderDog, beach: renderBeach, penguin: renderPenguin };
 let figureMode = 'dog';
-try { if (localStorage.getItem('pulse-figure') === 'beach') figureMode = 'beach'; } catch { /* 記憶できなくても動く */ }
+try { const m = localStorage.getItem('pulse-figure'); if (FIGURES[m]) figureMode = m; } catch { /* 記憶できなくても動く */ }
 let figureKey = '';
 function drawFigure(key) {
   figureKey = key;
   FIGURES[figureMode]($('zoneFig'), key);
-  const t = $('figToggle');
-  t.textContent = figureMode === 'dog' ? '浜辺にする' : '犬にする';
-  t.setAttribute('aria-pressed', String(figureMode === 'beach'));
+  for (const b of document.querySelectorAll('#figPick [data-fig]')) b.setAttribute('aria-pressed', String(b.dataset.fig === figureMode));
 }
-function toggleFigure() {
+function selectFigure(mode) {
+  if (!FIGURES[mode] || mode === figureMode) return;
   FIGURES[figureMode]($('zoneFig'), '');
-  $('zoneFig').classList.remove('pulse-dog-svg', 'beach-svg');
-  figureMode = figureMode === 'dog' ? 'beach' : 'dog';
+  $('zoneFig').classList.remove('pulse-dog-svg', 'beach-svg', 'pulse-cm-svg');
+  figureMode = mode;
   try { localStorage.setItem('pulse-figure', figureMode); } catch { /* 記憶できなくても動く */ }
   drawFigure(figureKey);
 }
@@ -818,7 +818,7 @@ function num(v) { const n = Number(v); return v === '' || !Number.isFinite(n) ? 
 function bind() {
   $('connectBtn').onclick = onConnectClick;
   $('fsBtn').onclick = toggleFs;
-  $('figToggle').onclick = toggleFigure;
+  for (const b of document.querySelectorAll('#figPick [data-fig]')) b.onclick = () => selectFigure(b.dataset.fig);
   $('fsExit').onclick = toggleFs;
   // Escなどでブラウザの全画面が解除されたら表示も戻す
   document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && document.body.classList.contains('fs')) applyFs(false); });

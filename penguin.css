@@ -1,0 +1,35 @@
+/**
+ * PULSE — PENGUIN STYLESHEET (penguin.css)
+ * penguin.js が使う .cm-* の色・線幅クラス（CSP対応のためインラインstyleは使わない）
+ */
+.pulse-penguin-svg,
+.pulse-cm-svg {
+  display: block;
+}
+
+/* 塗り */
+.pulse-cm-svg .cm-fill-silver { fill: #5f7183; }
+.pulse-cm-svg .cm-fill-white  { fill: #f3f4f1; }
+.pulse-cm-svg .cm-fill-dark   { fill: #161918; }
+.pulse-cm-svg .cm-fill-yellow { fill: #f3d35a; }
+.pulse-cm-svg .cm-fill-tan    { fill: #d98b48; }
+.pulse-cm-svg .cm-fill-coral  { fill: #e86f52; opacity: .55; }
+.pulse-cm-svg .cm-fill-splash { fill: #6fd4e6; opacity: .8; }
+
+/* 線（線だけの部品は塗りなし） */
+.pulse-cm-svg [class*="cm-stroke-"] { stroke-linecap: round; stroke-linejoin: round; }
+.pulse-cm-svg line, .pulse-cm-svg path.cm-stroke-coral, .pulse-cm-svg path.cm-stroke-yellow { fill: none; }
+.pulse-cm-svg .cm-stroke-sea    { stroke: #4ea8b8; }
+.pulse-cm-svg .cm-stroke-splash { stroke: #6fd4e6; opacity: .7; }
+.pulse-cm-svg .cm-stroke-lime   { stroke: #c6f36b; opacity: .8; }
+.pulse-cm-svg .cm-stroke-white  { stroke: #f3f4f1; }
+.pulse-cm-svg .cm-stroke-coral  { stroke: #e86f52; }
+.pulse-cm-svg .cm-stroke-yellow { stroke: #f3d35a; }
+
+/* 線幅 */
+.pulse-cm-svg .cm-sw-1  { stroke-width: 1; }
+.pulse-cm-svg .cm-sw-15 { stroke-width: 1.5; }
+.pulse-cm-svg .cm-sw-2  { stroke-width: 2; }
+.pulse-cm-svg .cm-sw-25 { stroke-width: 2.5; }
+.pulse-cm-svg .cm-sw-3  { stroke-width: 3; }
+.pulse-cm-svg .cm-sw-35 { stroke-width: 3.5; }
